@@ -35,7 +35,10 @@ lxc-attach -n $CTID -- systemctl enable docker
 lxc-attach -n $CTID -- systemctl start docker
 
 msg_info "Cloning Checkmate repository..."
-lxc-attach -n $CTID -- bash -c "cd /root && git clone https://github.com/checkmateso/checkmate.git"
+lxc-attach -n $CTID -- bash -c "cd /root && git clone --depth=1 https://github.com/bluewave-labs/Checkmate.git"
+
+msg_info "Pulling Docker images for Checkmate..."
+lxc-attach -n $CTID -- bash -c "cd /root/Checkmate && docker compose pull"
 
 msg_info "Setting up environment..."
 lxc-attach -n $CTID -- bash -c "cd /root/checkmate && cp .env.example .env"
