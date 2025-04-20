@@ -35,32 +35,29 @@ lxc-attach -n "$CTID" -- systemctl start docker
 msg_ok "Docker & dependencies installed."
 
 msg_info "Cloning Checkmate repository..."
-lxc-attach -n "$CTID" -- bash -c "cd /root && git clone --depth=1 https://github.com/bluewave-labs/Checkmate.git"
+lxc-attach -n "$CTID" -- bash -c "cd /root && git clone https://github.com/bluewave-labs/Checkmate.git"
 msg_ok "Checkmate cloned successfully."
 
 msg_info "Downloading docker-compose.yaml..."
-lxc-attach -n "$CTID" -- bash -c "curl -fsSL https://raw.githubusercontent.com/bluewave-labs/Checkmate/refs/heads/master/Docker/dist/docker-compose.yaml -o /root/Checkmate/docker-compose.yaml"
+lxc-attach -n "$CTID" -- bash -c "mkdir -p /root/Checkmate/Docker/dist && curl -fsSL https://raw.githubusercontent.com/bluewave-labs/Checkmate/refs/heads/master/Docker/dist/docker-compose.yaml -o /root/Checkmate/Docker/dist/docker-compose.yaml"
 msg_ok "docker-compose.yaml downloaded."
 
 msg_info "Creating environment files..."
-
-# Backend .env
-lxc-attach -n "$CTID" -- bash -c "cat <<EOF > /root/Checkmate/backend/.env
+lxc-attach -n "$CTID" -- bash -c "mkdir -p /root/Checkmate/backend && cat <<EOF > /root/Checkmate/backend/.env
 ENVIRONMENT=development
 PORT=5000
 CHECKMATE_API_KEY=supersecurekey
 EOF"
 
-# Frontend .env
-lxc-attach -n "$CTID" -- bash -c "cat <<EOF > /root/Checkmate/frontend/.env
+lxc-attach -n "$CTID" -- bash -c "mkdir -p /root/Checkmate/frontend && cat <<EOF > /root/Checkmate/frontend/.env
 VITE_API_BASE_URL=http://localhost:5000
 EOF"
-
 msg_ok ".env files created successfully."
 
 msg_info "Starting Checkmate with Docker Compose..."
-lxc-attach -n "$CTID" -- bash -c "cd /root/Checkmate && docker-compose up -d"
+lxc-attach -n "$CTID" -- bash -c "cd /root/Checkmate/Docker/dist && docker-compose up -d"
 msg_ok "Checkmate is now running in the background."
+
 
 msg_ok "Completed Successfully!"
 echo -e "${CREATING}${GN}${APP} setup has been successfully initialized!${CL}"
