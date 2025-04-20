@@ -1,23 +1,30 @@
 #!/usr/bin/env bash
-# source <(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/build.func)
+source <(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/build.func)
 # Copyright (c) 2021-2025 tteck
 # Author: tteck (tteckster)
+# Modified by: Layer Group
 # License: MIT | https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 # Source: https://docs.checkmate.so/
 
 APP="Checkmate"
-var_tags="${var_tags:-docker,web}"
+var_tags="${var_tags:-ai,docker}"
 var_cpu="${var_cpu:-2}"
 var_ram="${var_ram:-2048}"
 var_disk="${var_disk:-8}"
 var_os="${var_os:-ubuntu}"
 var_version="${var_version:-22.04}"
-var_unprivileged="${var_unprivileged:-0}" # Needs privileged for nesting/docker
+var_unprivileged="${var_unprivileged:-0}" # Needs privileged for Docker
 
 header_info "$APP"
 variables
 color
 catch_errors
+
+function update_script() {
+  header_info
+  msg_error "No update logic implemented for $APP yet."
+  exit
+}
 
 start
 build_container
@@ -27,12 +34,19 @@ msg_info "Installing Docker & Checkmate..."
 lxc-attach -n $CTID -- bash -c "apt update && apt install -y docker.io docker-compose git"
 lxc-attach -n $CTID -- systemctl enable docker
 lxc-attach -n $CTID -- systemctl start docker
+
+msg_info "Cloning Checkmate repository..."
 lxc-attach -n $CTID -- bash -c "cd /root && git clone https://github.com/checkmateso/checkmate.git"
+
+msg_info "Setting up environment file..."
 lxc-attach -n $CTID -- bash -c "cd /root/checkmate && cp .env.example .env"
+
+msg_info "Starting Checkmate..."
 lxc-attach -n $CTID -- bash -c "cd /root/checkmate && docker compose up -d"
+
 msg_ok "Installed Docker & Checkmate"
 
 msg_ok "Completed Successfully!\n"
 echo -e "${CREATING}${GN}${APP} setup has been successfully initialized!${CL}"
 echo -e "${INFO}${YW} Access it using the following URL:${CL}"
-echo -e "${TAB}${GATEWAY}${BGN}http://${IP}:3000${CL}" 
+echo -e "${TAB}${GATEWAY}${BGN}http://${IP}:3000${CL}"
