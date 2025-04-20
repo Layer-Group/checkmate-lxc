@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 source <(curl -fsSL https://raw.githubusercontent.com/Layer-Group/checkmate-lxc/main/misc/build.func)
-# Copyright (c) 2021-2025 Layer Group
+# Copyright (c) 2025 Layer Group
 # Author: Bryan Trappenberg
 # License: MIT | https://github.com/Layer-Group/checkmate-lxc/blob/main/LICENSE
 # Source: https://docs.checkmate.so/
