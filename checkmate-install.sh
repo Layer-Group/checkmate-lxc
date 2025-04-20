@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 source <(curl -fsSL https://raw.githubusercontent.com/Layer-Group/checkmate-lxc/main/misc/build.func)
-# Copyright (c) 2025 Layer Group
-# Author: Bryan Trappenberg
-# License: MIT | https://github.com/Layer-Group/checkmate-lxc/blob/main/LICENSE
-# Source: https://docs.checkmate.so/
 
 APP="Checkmate"
 var_tags="${var_tags:-ai,docker}"
@@ -40,25 +36,13 @@ lxc-attach -n $CTID -- systemctl start docker
 msg_info "Cloning Checkmate repository..."
 lxc-attach -n $CTID -- bash -c "cd /root && git clone --depth=1 https://github.com/bluewave-labs/Checkmate.git"
 
-# Remove or comment out:
-# msg_info "Pulling Docker images for Checkmate..."
-# lxc-attach -n $CTID -- bash -c "cd /root/Checkmate && docker-compose pull"
+msg_ok "Checkmate cloned successfully."
+msg_info "Note: No docker-compose.yml found. You may need to start the dev server manually."
 
-# Replace with post-clone instructions
-msg_ok "Checkmate cloned. No docker-compose file present."
-msg_info "Please follow manual instructions to run services:"
-echo -e "${TAB}${INFO} Run: ${CL}cd /root/Checkmate && ./scripts/dev.sh"
-
-
-msg_info "Setting up environment..."
-lxc-attach -n $CTID -- bash -c "cd /root/Checkmate && cp .env.example .env"
-
-msg_info "Starting Checkmate with Docker Compose..."
-lxc-attach -n $CTID -- bash -c "cd /root/Checkmate && docker-compose up -d"
-
-msg_ok "Docker & Checkmate installed successfully"
+msg_info "Suggested next steps (inside LXC):"
+echo -e "${TAB}${INFO} Run:${CL} cd /root/Checkmate && ./scripts/dev.sh"
 
 msg_ok "Completed Successfully!\n"
 echo -e "${CREATING}${GN}${APP} setup has been successfully initialized!${CL}"
-echo -e "${INFO}${YW} Access it using the following URL:${CL}"
+echo -e "${INFO}${YW} Access it using the following URL (after dev server starts):${CL}"
 echo -e "${TAB}${GATEWAY}${BGN}http://${IP}:3000${CL}"
