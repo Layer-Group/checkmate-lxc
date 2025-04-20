@@ -14,6 +14,8 @@ var_os="${var_os:-ubuntu}"
 var_version="${var_version:-22.04}"
 var_unprivileged="${var_unprivileged:-0}"  # Docker requires privileged container
 
+SPINNER_PID=""
+
 header_info "$APP"
 variables
 color
@@ -30,7 +32,8 @@ build_container
 description
 
 msg_info "Installing Docker & Checkmate..."
-lxc-attach -n $CTID -- bash -c "apt update && apt install -y docker.io docker-compose git"
+lxc-attach -n $CTID -- bash -c "apt update && apt install -y docker.io docker-compose git locales"
+lxc-attach -n $CTID -- bash -c "locale-gen en_US.UTF-8 && update-locale LANG=en_US.UTF-8"
 lxc-attach -n $CTID -- systemctl enable docker
 lxc-attach -n $CTID -- systemctl start docker
 
@@ -38,13 +41,13 @@ msg_info "Cloning Checkmate repository..."
 lxc-attach -n $CTID -- bash -c "cd /root && git clone --depth=1 https://github.com/bluewave-labs/Checkmate.git"
 
 msg_info "Pulling Docker images for Checkmate..."
-lxc-attach -n $CTID -- bash -c "cd /root/Checkmate && docker compose pull"
+lxc-attach -n $CTID -- bash -c "cd /root/Checkmate && docker-compose pull"
 
 msg_info "Setting up environment..."
-lxc-attach -n $CTID -- bash -c "cd /root/checkmate && cp .env.example .env"
+lxc-attach -n $CTID -- bash -c "cd /root/Checkmate && cp .env.example .env"
 
 msg_info "Starting Checkmate with Docker Compose..."
-lxc-attach -n $CTID -- bash -c "cd /root/checkmate && docker compose up -d"
+lxc-attach -n $CTID -- bash -c "cd /root/Checkmate && docker-compose up -d"
 
 msg_ok "Docker & Checkmate installed successfully"
 
