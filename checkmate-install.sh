@@ -40,8 +40,15 @@ lxc-attach -n $CTID -- systemctl start docker
 msg_info "Cloning Checkmate repository..."
 lxc-attach -n $CTID -- bash -c "cd /root && git clone --depth=1 https://github.com/bluewave-labs/Checkmate.git"
 
-msg_info "Pulling Docker images for Checkmate..."
-lxc-attach -n $CTID -- bash -c "cd /root/Checkmate && docker-compose pull"
+# Remove or comment out:
+# msg_info "Pulling Docker images for Checkmate..."
+# lxc-attach -n $CTID -- bash -c "cd /root/Checkmate && docker-compose pull"
+
+# Replace with post-clone instructions
+msg_ok "Checkmate cloned. No docker-compose file present."
+msg_info "Please follow manual instructions to run services:"
+echo -e "${TAB}${INFO} Run: ${CL}cd /root/Checkmate && ./scripts/dev.sh"
+
 
 msg_info "Setting up environment..."
 lxc-attach -n $CTID -- bash -c "cd /root/Checkmate && cp .env.example .env"
