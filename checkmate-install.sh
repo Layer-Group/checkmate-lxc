@@ -42,14 +42,29 @@ msg_info "Downloading docker-compose.yaml..."
 lxc-attach -n "$CTID" -- bash -c "curl -fsSL https://raw.githubusercontent.com/bluewave-labs/Checkmate/refs/heads/master/Docker/dist/docker-compose.yaml -o /root/Checkmate/docker-compose.yaml"
 msg_ok "docker-compose.yaml downloaded."
 
-msg_info "Next steps:"
-echo -e "${TAB}${INFO} Inside the LXC, run the following to start Checkmate in dev mode:${CL}"
-echo -e "${TAB}${YW}cd /root/Checkmate && docker-compose up -d${CL}"
-echo -e "${TAB}${YW}OR run dev mode: ./scripts/dev.sh${CL}"
+msg_info "Creating environment files..."
+
+# Backend .env
+lxc-attach -n "$CTID" -- bash -c "cat <<EOF > /root/Checkmate/backend/.env
+ENVIRONMENT=development
+PORT=5000
+CHECKMATE_API_KEY=supersecurekey
+EOF"
+
+# Frontend .env
+lxc-attach -n "$CTID" -- bash -c "cat <<EOF > /root/Checkmate/frontend/.env
+VITE_API_BASE_URL=http://localhost:5000
+EOF"
+
+msg_ok ".env files created successfully."
+
+msg_info "Starting Checkmate with Docker Compose..."
+lxc-attach -n "$CTID" -- bash -c "cd /root/Checkmate && docker-compose up -d"
+msg_ok "Checkmate is now running in the background."
 
 msg_ok "Completed Successfully!"
 echo -e "${CREATING}${GN}${APP} setup has been successfully initialized!${CL}"
-echo -e "${INFO}${YW} You can access the frontend at:${CL}"
+echo -e "${INFO}${YW} Frontend should be accessible at:${CL}"
 echo -e "${TAB}${GATEWAY}${BGN}http://${IP}:5173${CL}"
-echo -e "${INFO}${YW} You can access the backend at:${CL}"
+echo -e "${INFO}${YW} Backend API should be accessible at:${CL}"
 echo -e "${TAB}${GATEWAY}${BGN}http://${IP}:5000${CL}"
